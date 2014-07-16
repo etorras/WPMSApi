@@ -4,11 +4,11 @@ Tags: json api, rest json api, register user via rest, wordpress restful user re
 
 Contributors: etorras
 
-Stable tag: 0.1
+Stable tag: 02.
 
 Requires at least: 3.0.1
 
-Tested up to: 3.8.1
+Tested up to: 3.9.1
 
 License: GPLv2 or later
 

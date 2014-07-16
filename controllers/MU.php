@@ -21,6 +21,7 @@ class JSON_API_MU_Controller {
 	 */ 
     public function create(){
 	    global $json_api;
+$charset = get_option('blog_charset');
 	  
         $parameters['domain'] = sanitize_text_field($_REQUEST['domain']);
         $parameters['path'] = sanitize_text_field($_REQUEST['path']);
@@ -34,22 +35,29 @@ class JSON_API_MU_Controller {
         if ('' == $parameters['site_id']) $parameters['site_id'] = 1;              
         
 		if ('' == $parameters['domain']) {
-			header("HTTP/1.0 400 Params error");
-			return []; 
+                        header("HTTP/1.1 400 Params error");
+                        header("Content-Type: application/json; charset=$charset", true);
+                        flush();
+                        $json_api->error("You must include 'domain' var in your request. ", 400);
 		}
 		if ('' == $parameters['path']) {
-			header("HTTP/1.0 400 Params error");
-			return [];
+                        header("HTTP/1.1 400 Params error");
+                        header("Content-Type: application/json; charset=$charset", true);
+                        flush();
+                        $json_api->error("You must include 'path' var in your request. ", 400);
 		}
 		if ('' == $parameters['user_id']) {
-			header("HTTP/1.0 400 Params error");
-			return [];
+                        header("HTTP/1.1 400 Params error");
+                        header("Content-Type: application/json; charset=$charset", true);
+                        flush();
+                        $json_api->error("You must include 'user_id' var in your request. ", 400);		
 		}
 		if ('' == $parameters['username']) {
-			header("HTTP/1.0 400 Params error");
-			return [];
+			header("HTTP/1.1 400 Params error");
+	                header("Content-Type: application/json; charset=$charset", true);
+        	        flush();
+			$json_api->error("You must include 'username' var in your request. ", 400);			
 		}
-		
         // if the user_id is the user's e-mail
         if (!is_int($parameters['user_id']) ) {
         	if (!($user_id = get_user_id_from_string($parameters['user_id'])) ) {
@@ -59,8 +67,10 @@ class JSON_API_MU_Controller {
         		);
         		
         		if ('' != $error['errors']->get_error_code()) {
-        			header("HTTP/1.0 400 Bad params");
-        			return ['body' => $error['errors']];
+        			header("HTTP/1.1 400 Bad params");
+			        header("Content-Type: application/json; charset=$charset", true);
+		                flush(); 
+				$json_api->error($error['errors'], 400);				     
         		}
         		if ('' == $parameters['password']) {
         			$parameters['password'] = wp_generate_password();
@@ -77,10 +87,11 @@ class JSON_API_MU_Controller {
         else {
         	// Comprobar que existe el id
         }
-
         if ($this->findBlog($parameters['domain'], $parameters['path']) !== false) {
-        	header("HTTP/1.0 409 Site already exists");
-			return [];
+        	header("HTTP/1.1 409 Site already exists");
+		header("Content-Type: application/json; charset=$charset", true);
+		flush();
+		$json_api->error("Site already exists ", 409);			
         }
         
         $id_blog = wpmu_create_blog(
@@ -103,7 +114,9 @@ class JSON_API_MU_Controller {
         $path = sanitize_text_field( $_REQUEST['path'] );
 
         if ('' == $domain || '' == $path) {
-            $json_api->error("You must include 'domain' and 'path' var in your request.", "KO");
+        	header("HTTP/1.1 400 Bad params");
+		header("Content-Type: application/json; charset=$charset", true);
+	        $json_api->error("You must include 'domain' and 'path' var in your request.", 400);
         }
 
         return array($this->findBlog($domain, $path));
