@@ -10,13 +10,15 @@
   License: GPLv3
  */
 
-include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
+include_once(ABSPATH . 'wp-admin/includes/plugin.php');
+include_once('Parameters.php');
 define('JSON_API_MU_HOME', dirname(__FILE__));
 
 if (!is_plugin_active('json-api/json-api.php')) {
     add_action('admin_notices', 'pim_mu_draw_notice_json_api');
     return;
 }
+add_option('wp_mu_apikey', Parameters::API_KEY);
 
 add_filter('json_api_controllers', 'pimMuJsonApiController');
 add_filter('json_api_mu_controller_path', 'setMuControllerPath');

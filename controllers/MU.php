@@ -19,9 +19,16 @@ class JSON_API_MU_Controller {
 	 * $meta    Other meta information.
 	 * $site_id The site_id of the blog to be created.
 	 */ 
-    public function create(){
-	    global $json_api;
-$charset = get_option('blog_charset');
+    public function create(){    	
+   	    global $json_api;
+		$charset = get_option('blog_charset');
+		
+		if (sanitize_text_field($_REQUEST['apikey']) != get_option('wp_mu_apikey')) {
+			header("HTTP/1.1 403 Forbidden");
+			header("Content-Type: application/json; charset=$charset", true);
+			flush();
+			$json_api->error("You are not authorized", 403);
+		}
 	  
         $parameters['domain'] = sanitize_text_field($_REQUEST['domain']);
         $parameters['path'] = sanitize_text_field($_REQUEST['path']);
@@ -54,8 +61,8 @@ $charset = get_option('blog_charset');
 		}
 		if ('' == $parameters['username']) {
 			header("HTTP/1.1 400 Params error");
-	                header("Content-Type: application/json; charset=$charset", true);
-        	        flush();
+	        header("Content-Type: application/json; charset=$charset", true);
+        	flush();
 			$json_api->error("You must include 'username' var in your request. ", 400);			
 		}
         // if the user_id is the user's e-mail
@@ -89,9 +96,9 @@ $charset = get_option('blog_charset');
         }
         if ($this->findBlog($parameters['domain'], $parameters['path']) !== false) {
         	header("HTTP/1.1 409 Site already exists");
-		header("Content-Type: application/json; charset=$charset", true);
-		flush();
-		$json_api->error("Site already exists ", 409);			
+			header("Content-Type: application/json; charset=$charset", true);
+			flush();
+			$json_api->error("Site already exists ", 409);			
         }
         
         $id_blog = wpmu_create_blog(
