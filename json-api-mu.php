@@ -12,19 +12,19 @@
 
 include_once(ABSPATH . 'wp-admin/includes/plugin.php');
 include_once(ABSPATH . 'wp-includes/pluggable.php');
-//include_once('Parameters.php');
+
 define('JSON_API_MU_HOME', dirname(__FILE__));
 
 if (!is_plugin_active('json-api/json-api.php')) {
     add_action('admin_notices', 'pim_mu_draw_notice_json_api');
     return;
 }
-//add_option('wp_mu_apikey', Parameters::API_KEY);
+//if Api key is empty
 if(get_option('wp_mu_apikey') == ''){
   add_option( 'wp_mu_apikey', wp_generate_password());
 }  
 add_action('admin_menu', 'custom_api_key');
-//
+
 function custom_api_key (){
   add_options_page('Api Key Page', 'Api Key', 10, 'custom_api_key_file', 'custom_api_key_setting');
 }
