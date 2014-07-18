@@ -4,7 +4,7 @@ Tags: json api, rest json api, register user via rest, wordpress restful user re
 
 Contributors: etorras
 
-Stable tag: 0.3
+Stable tag: 0.5
 
 Requires at least: 3.0.1
 
@@ -52,7 +52,9 @@ To install JSON API User just follow these steps:
 
 = 0.1 =
 * Initial release.
-= 0.3=
+= 0.4 =
 * Initial Api key
 * Form to set new api key
+= 0.5 =
+* User metadata function
 ==Frequently Asked Questions==
