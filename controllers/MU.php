@@ -109,9 +109,20 @@ class JSON_API_MU_Controller {
         		$parameters['meta'],
         		$parameters['site_id']
         );
-        return ['blog_id' => $id_blog];
+        return ['blog_id' => $id_blog, 'user_id' => $user_id];
+
     }
-   
+     public function setLDAPLogin() {
+       $user_id = $_REQUEST['user_id'];
+       if ('' != get_user_meta($user_id, 'ldap_login')) {
+               update_user_meta($user_id, 'ldap_login', 'true');
+       } 
+       else {
+               add_user_meta($user_id, 'ldap_login', 'true');
+       }
+       return [];
+   }
+
    
     public function getBlogId()
     {
