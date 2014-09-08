@@ -188,7 +188,6 @@ class JSON_API_MU_Controller {
             // if user exist
             if ($user = get_user_by('email',$parameters['user_id']) ) {
                 $user_id = $user->ID;
-                $exist = 1;
          // if user not exist      
         } else {
             $error = wpmu_validate_user_signup(
@@ -210,11 +209,10 @@ class JSON_API_MU_Controller {
                 $parameters['password'],
                 $parameters['user_id']
             );
-                $exist = 0;
 
         }
 
-        return array('exist' => $exist, 'user_id' => $user_id);
+        return array('user_id' => $user_id);
 
         }
 
