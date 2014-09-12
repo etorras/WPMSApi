@@ -109,7 +109,7 @@ class JSON_API_MU_Controller {
         		$parameters['meta'],
         		$parameters['site_id']
         );
-        return ['blog_id' => $id_blog, 'user_id' => $user_id];
+        return array('blog_id' => $id_blog, 'user_id' => $user_id);
 
     }
      public function setLDAPLogin() {
@@ -120,7 +120,7 @@ class JSON_API_MU_Controller {
        else {
                add_user_meta($user_id, 'ldap_login', 'true');
        }
-       return [];
+       return array();
    }
 
    
@@ -153,5 +153,124 @@ class JSON_API_MU_Controller {
             return false;
         }
         return array('blog_id' => $domain_found[0]->blog_id);
-    }    
+    }
+
+     public function createUser(){      
+        global $json_api;
+        $charset = get_option('blog_charset');
+        
+        if (sanitize_text_field($_REQUEST['apikey']) != get_option('wp_mu_apikey')) {
+            header("HTTP/1.1 403 Forbidden");
+            header("Content-Type: application/json; charset=$charset", true);
+            flush();
+            $json_api->error("You are not authorized", 403);
+        }
+      
+       
+        $parameters['user_id'] = sanitize_text_field($_REQUEST['user_id']);
+        $parameters['username'] = sanitize_text_field($_REQUEST['username']);
+    
+        
+        if ('' == $parameters['user_id']) {
+            header("HTTP/1.1 400 Params error");
+            header("Content-Type: application/json; charset=$charset", true);
+            flush();
+            $json_api->error("You must include 'user_id' var in your request. ", 400);      
+        }
+        if ('' == $parameters['username']) {
+            header("HTTP/1.1 400 Params error");
+            header("Content-Type: application/json; charset=$charset", true);
+            flush();
+            $json_api->error("You must include 'username' var in your request. ", 400);         
+        }
+        // if the user_id is the user's e-mail
+        if (!is_int($parameters['user_id']) ) {
+            // if user exist
+            if ($user = get_user_by('email',$parameters['user_id']) ) {
+                $user_id = $user->ID;
+         // if user not exist      
+        } else {
+            $error = wpmu_validate_user_signup(
+                    $parameters['username'],
+                    $parameters['user_id']
+                );
+                
+            if ('' != $error['errors']->get_error_code()) {
+                header("HTTP/1.1 400 Bad params");
+                header("Content-Type: application/json; charset=$charset", true);
+                flush(); 
+                $json_api->error($error['errors']->get_error_code(), 400);                     
+            }
+            if ('' == $parameters['password']) {
+                $parameters['password'] = wp_generate_password();
+            }
+            $user_id = wpmu_create_user(
+                $parameters['username'],
+                $parameters['password'],
+                $parameters['user_id']
+            );
+
+        }
+
+        return array('user_id' => $user_id);
+
+        }
+
+    }
+   
+    public function userEnroll(){
+        global $json_api;
+        $charset = get_option('blog_charset');
+        
+        if (sanitize_text_field($_REQUEST['apikey']) != get_option('wp_mu_apikey')) {
+            header("HTTP/1.1 403 Forbidden");
+            header("Content-Type: application/json; charset=$charset", true);
+            flush();
+            $json_api->error("You are not authorized", 403);
+        }
+
+        $parameters['blog_id'] = sanitize_text_field($_REQUEST['blog_id']);
+        //User id number 
+        $parameters['id'] = sanitize_text_field($_REQUEST['id']);
+
+        if ('' == $parameters['id']) {
+            header("HTTP/1.1 400 Params error");
+            header("Content-Type: application/json; charset=$charset", true);
+            flush();
+            $json_api->error("You must include 'id' var in your request. ", 400);      
+        }
+        if ('' == $parameters['blog_id']) {
+            header("HTTP/1.1 400 Params error");
+            header("Content-Type: application/json; charset=$charset", true);
+            flush();
+            $json_api->error("You must include 'blog_id' var in your request. ", 400);         
+        }
+        //Checks if the user is already a member of the blog
+        if(is_user_member_of_blog($parameters['id'],$parameters['blog_id'])){
+            header("HTTP/1.1 409 The user is already a member of the blog");
+            header("Content-Type: application/json; charset=$charset", true);
+            flush();
+            $json_api->error("The user is already a member of the blog", 409);       
+        }
+        //Checks if the blog exists
+        if(!get_blog_details($parameters['blog_id'])){
+            header("HTTP/1.1 400 Bad params");
+            header("Content-Type: application/json; charset=$charset", true);
+            flush(); 
+            $json_api->error("The blog does not exist", 400); 
+        }      
+        //Associates a user to a blog with 'Autor' role
+        $enroll = add_user_to_blog($parameters['blog_id'],$parameters['id'],'Autor');
+        //Checks if the user exists
+        if('' != $enroll->get_error_code()){
+            header("HTTP/1.1 400 Bad params");
+            header("Content-Type: application/json; charset=$charset", true);
+            flush(); 
+            $json_api->error($enroll->get_error_code(), 400);  
+        }                 
+         
+        return array();
+    }      
+        
+     
 }

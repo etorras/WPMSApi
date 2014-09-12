@@ -51,10 +51,22 @@ To install JSON API User just follow these steps:
 == Upgrade Notice ==
 
 = 0.1 =
+
 * Initial release.
+
 = 0.4 =
+
 * Initial Api key
 * Form to set new api key
+
 = 0.5 =
+
 * User metadata function
+
+= 0.6 =
+
+* createUser and userEnroll functions
+* Changed definition of arrays
+
+
 ==Frequently Asked Questions==
