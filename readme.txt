@@ -68,5 +68,8 @@ To install JSON API User just follow these steps:
 * createUser and userEnroll functions
 * Changed definition of arrays
 
+= 0.7 =
+
+* checkPath function
 
 ==Frequently Asked Questions==
