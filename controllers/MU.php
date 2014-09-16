@@ -270,7 +270,42 @@ class JSON_API_MU_Controller {
         }                 
          
         return array();
-    }      
+    }
+
+    public function checkPath(){
+        global $json_api;
+        $charset = get_option('blog_charset');
+        
+        if (sanitize_text_field($_REQUEST['apikey']) != get_option('wp_mu_apikey')) {
+            header("HTTP/1.1 403 Forbidden");
+            header("Content-Type: application/json; charset=$charset", true);
+            flush();
+            $json_api->error("You are not authorized", 403);
+        }
+
+        $parameters['domain'] = sanitize_text_field($_REQUEST['domain']);
+        $parameters['path'] = sanitize_text_field($_REQUEST['path']);
+
+
+        if ('' == $parameters['domain']) {
+                        header("HTTP/1.1 400 Params error");
+                        header("Content-Type: application/json; charset=$charset", true);
+                        flush();
+                        $json_api->error("You must include 'domain' var in your request. ", 400);
+        }
+        if ('' == $parameters['path']) {
+                        header("HTTP/1.1 400 Params error");
+                        header("Content-Type: application/json; charset=$charset", true);
+                        flush();
+                        $json_api->error("You must include 'path' var in your request. ", 400);
+        }
+        //Checks if blog is active with domain and path parameters
+        $addres = domain_exists($parameters['domain'],'/' . $parameters['path']);
+        //If blog exists return 1 else return 0
+        (!$addres) ? $active = 0 : $active = 1;
+
+        return array('Active' => $active);
+    }       
         
      
 }
