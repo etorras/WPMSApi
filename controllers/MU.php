@@ -67,7 +67,14 @@ class JSON_API_MU_Controller {
 		}
         // if the user_id is the user's e-mail
         if (!is_int($parameters['user_id']) ) {
-        	if (!($user_id = get_user_id_from_string($parameters['user_id'])) ) {
+        	if (!$this->checkUser($parameters['user_id'])) {
+        		header("HTTP/1.1 409 User already exists");
+				header("Content-Type: application/json; charset=$charset", true);
+				flush();
+				$json_api->error("User already exists ", 409);	
+        	}
+        	else
+        	{
         		$error = wpmu_validate_user_signup(
         				$parameters['username'],
         				$parameters['user_id']
@@ -76,7 +83,7 @@ class JSON_API_MU_Controller {
         		if ('' != $error['errors']->get_error_code()) {
         			header("HTTP/1.1 400 Bad params");
 			        header("Content-Type: application/json; charset=$charset", true);
-		                flush(); 
+		            flush(); 
 				$json_api->error($error['errors'], 400);				     
         		}
         		if ('' == $parameters['password']) {
@@ -87,12 +94,8 @@ class JSON_API_MU_Controller {
         				$parameters['password'],
         				$parameters['user_id']
         		);
-        	}
-        	// User found by email, set user_id param with user id       
-        	$parameters['user_id'] = $user_id;        	
-        }
-        else {
-        	// Comprobar que existe el id
+        	}	
+        			    	
         }
         if ($this->findBlog($parameters['domain'], $parameters['path']) !== false) {
         	header("HTTP/1.1 409 Site already exists");
@@ -109,9 +112,18 @@ class JSON_API_MU_Controller {
         		$parameters['meta'],
         		$parameters['site_id']
         );
-        return array('blog_id' => $id_blog, 'user_id' => $user_id);
+   		
+        return array('blog_id' => $id_blog, 'user_id' => $user_id, 'path' => $parameters['path'] );
 
     }
+
+    private function checkUser($mail) {
+    	if ($user = get_user_by('email',$mail) ) {
+    			return false;
+    	}
+    	return true;
+    }
+
      public function setLDAPLogin() {
        $user_id = $_REQUEST['user_id'];
        if ('' != get_user_meta($user_id, 'ldap_login')) {
