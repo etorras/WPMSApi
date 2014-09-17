@@ -113,7 +113,7 @@ class JSON_API_MU_Controller {
         		$parameters['site_id']
         );
    		
-        return array('blog_id' => $id_blog, 'user_id' => $user_id, 'path' => $parameters['path'] );
+        return array('blog_id' => $id_blog, 'user_id' => $user_id, 'path' => $parameters['path']);
 
     }
 
