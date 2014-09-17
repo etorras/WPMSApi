@@ -272,7 +272,7 @@ class JSON_API_MU_Controller {
             $json_api->error("The blog does not exist", 400); 
         }      
         //Associates a user to a blog with 'Autor' role
-        $enroll = add_user_to_blog($parameters['blog_id'],$parameters['id'],'Autor');
+        $enroll = add_user_to_blog($parameters['blog_id'],$parameters['id'],'author');
         //Checks if the user exists
         if('' != $enroll->get_error_code()){
             header("HTTP/1.1 400 Bad params");
