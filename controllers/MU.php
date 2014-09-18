@@ -145,7 +145,7 @@ class JSON_API_MU_Controller {
 
         if ('' == $domain || '' == $path) {
         	header("HTTP/1.1 400 Bad params");
-		header("Content-Type: application/json; charset=$charset", true);
+			header("Content-Type: application/json; charset=$charset", true);
 	        $json_api->error("You must include 'domain' and 'path' var in your request.", 400);
         }
 
@@ -161,8 +161,11 @@ class JSON_API_MU_Controller {
             $path . '/'
         ));
 
-        if ( !count($domain_found) ) {
-            return false;
+        if ( !count($domain_found) ){
+            header("HTTP/1.1 404 Not Found");
+            header("Content-Type: application/json; charset=$charset", true);
+            flush();
+            $json_api->error("Blog not found", 404);
         }
         return array('blog_id' => $domain_found[0]->blog_id);
     }
