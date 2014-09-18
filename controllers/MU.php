@@ -162,10 +162,7 @@ class JSON_API_MU_Controller {
         ));
 
         if ( !count($domain_found) ){
-            header("HTTP/1.1 404 Not Found");
-            header("Content-Type: application/json; charset=$charset", true);
-            flush();
-            $json_api->error("Blog not found", 404);
+           return false;
         }
         return array('blog_id' => $domain_found[0]->blog_id);
     }
@@ -269,10 +266,10 @@ class JSON_API_MU_Controller {
         }
         //Checks if the blog exists
         if(!get_blog_details($parameters['blog_id'])){
-            header("HTTP/1.1 400 Bad params");
+            header("HTTP/1.1 404 Not found");
             header("Content-Type: application/json; charset=$charset", true);
             flush(); 
-            $json_api->error("The blog does not exist", 400); 
+            $json_api->error("Blog not found", 400); 
         }      
         //Associates a user to a blog with 'Autor' role
         $enroll = add_user_to_blog($parameters['blog_id'],$parameters['id'],'author');
